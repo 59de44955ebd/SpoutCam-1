@@ -56,8 +56,19 @@ EXTERN_C const GUID IID_ICamSettings;
 EXTERN_C const GUID CLSID_SpoutCam;
 EXTERN_C const WCHAR SpoutCamName[MAX_PATH];
 
+
+//IPinFlowControl
+//Blocks data flow from an active output pin.
+//This interface is exposed by output pins that can reconnect dynamically.
+//Use this interface to start a dynamic reconnection within the filter graph.
+//For more information, see Dynamic Graph Building.
+//
+//Only method: Block() // The Block method blocks or unblocks the flow of data from the pin.
+
+
 class CVCamStream;
-class CVCam : public CSource,
+class CVCam : 
+	public CSource,
 	public ISpecifyPropertyPages,//VS
 	public ICamSettings//VS
 {
@@ -119,7 +130,15 @@ public:
 
 };
 
-class CVCamStream : public CSourceStream, public IAMStreamConfig, public IKsPropertySet, public IAMDroppedFrames
+class CVCamStream : 
+	public CSourceStream, // -> CAMThread + CBaseOutputPin
+
+	//public CDynamicSourceStream, // -> CAMThread + CDynamicOutputPin
+	//public CDynamicOutputPin, // -> CBaseOutputPin + IPinFlowControl
+
+	public IAMStreamConfig, 
+	public IKsPropertySet, 
+	public IAMDroppedFrames
 {
 
 public:

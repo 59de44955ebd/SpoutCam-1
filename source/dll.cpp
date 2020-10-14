@@ -155,6 +155,7 @@ STDAPI RegisterFilters( BOOL bRegister )
     if(bRegister)
     {
 		hr = AMovieSetupRegisterServer(CLSID_SpoutCam, SpoutCamName, achFileName, L"Both", L"InprocServer32");
+		hr = AMovieSetupRegisterServer(CLSID_SpoutCamPropertyPage, L"Settings", achFileName, L"Both", L"InprocServer32"); //VS
     }
 
     if( SUCCEEDED(hr) )
@@ -184,8 +185,11 @@ STDAPI RegisterFilters( BOOL bRegister )
           fm->Release();
     }
 
-    if( SUCCEEDED(hr) && !bRegister )
-        hr = AMovieSetupUnregisterServer( CLSID_SpoutCam );
+	if (SUCCEEDED(hr) && !bRegister)
+	{
+		hr = AMovieSetupUnregisterServer(CLSID_SpoutCam);
+		hr = AMovieSetupUnregisterServer(CLSID_SpoutCamPropertyPage); //VS
+	}
 
     CoFreeUnusedLibraries();
     CoUninitialize();
@@ -197,18 +201,14 @@ STDAPI RegisterFilters( BOOL bRegister )
 STDAPI DllRegisterServer()
 {
 	//<==================== VS-START ====================>
-	HRESULT hr = RegisterFilters(TRUE);
-	if (SUCCEEDED(hr)) hr = AMovieDllRegisterServer2(TRUE);
-	return hr;
+	return RegisterFilters(TRUE);
 	//<==================== VS-END ======================>
 }
 
 STDAPI DllUnregisterServer()
 {
 	//<==================== VS-START ====================>
-	HRESULT hr = RegisterFilters(FALSE);
-	if (SUCCEEDED(hr)) hr = AMovieDllRegisterServer2(FALSE);
-	return hr;
+	return RegisterFilters(FALSE);
 	//<==================== VS-END ======================>
 }
 
