@@ -140,17 +140,18 @@ HRESULT RegisterFilter(
 
 STDAPI RegisterFilters( BOOL bRegister )
 {
+	ASSERT(g_hInst != 0);
+
     HRESULT hr = NOERROR;
     WCHAR achFileName[MAX_PATH];
-    char achTemp[MAX_PATH];
-    ASSERT(g_hInst != 0);
+	
+	//<==================== VS-START ====================>
+	if (0 == GetModuleFileNameW(g_hInst, achFileName, sizeof(achFileName)))
+	{
+		return AmHresultFromWin32(GetLastError());
+	}
+	//<==================== VS-END ====================>
 
-    if( 0 == GetModuleFileNameA(g_hInst, achTemp, sizeof(achTemp))) 
-        return AmHresultFromWin32(GetLastError());
-
-    MultiByteToWideChar(CP_ACP, 0L, achTemp, lstrlenA(achTemp) + 1, 
-                       achFileName, NUMELMS(achFileName));
-  
     hr = CoInitialize(0);
     if(bRegister)
     {
@@ -200,16 +201,12 @@ STDAPI RegisterFilters( BOOL bRegister )
 // see http://msdn.microsoft.com/en-us/library/windows/desktop/dd376682%28v=vs.85%29.aspx
 STDAPI DllRegisterServer()
 {
-	//<==================== VS-START ====================>
 	return RegisterFilters(TRUE);
-	//<==================== VS-END ======================>
 }
 
 STDAPI DllUnregisterServer()
 {
-	//<==================== VS-START ====================>
 	return RegisterFilters(FALSE);
-	//<==================== VS-END ======================>
 }
 
 //<==================== VS-START ====================>
